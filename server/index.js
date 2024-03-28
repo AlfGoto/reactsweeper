@@ -25,9 +25,8 @@ io.on('connection', (socket) => {
     socket.firstClick = true
 
 
-    socket.on('click', msg => {
-        click(socket, msg)
-    })
+    socket.on('click', msg => { click(socket, msg) })
+    socket.on('leftRightClick', e => { socket.emit('leftRightClickResponse', { id: e, data: socket.grid[e] }) })
 })
 
 
@@ -64,7 +63,7 @@ function build() {
     return grid
 }
 function click(socket, id) {
-    if(socket.firstClick && socket.grid[id] != 0){
+    if (socket.firstClick && socket.grid[id] != 0) {
         socket.grid = build()
         click(socket, id)
     } else {

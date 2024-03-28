@@ -25,7 +25,13 @@
             align-items: center;
             height: 2svw;
             width: 2svw;
-            font-size: 1.5svw;
+            font-size: 1.7svw;
+
+            .imgFlag{
+                height: 100%;
+                width: 100%;
+                animation: fall .15s ease;
+            }
         }
 
         .dark {
@@ -46,6 +52,7 @@
             filter: contrast(90%);
             animation: animChecked 0.1s;
         }
+
     }
 }
 
@@ -62,3 +69,11 @@
         transform: scale(1);
     }
 }
+@keyframes fall {
+    from {
+      transform: translateY(-20px);
+    }
+    to{
+      transform:translateY(0);
+    }
+  }
