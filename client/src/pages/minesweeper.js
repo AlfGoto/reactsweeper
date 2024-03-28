@@ -1,7 +1,7 @@
-import './App.css';
+import '../App.css';
 import io from 'socket.io-client'
 
-function App() {
+function Minesweeper() {
 
     const socket = io.connect('http://localhost:4000')
     socket.on('msg', msg=>{console.log(msg)})
@@ -18,4 +18,4 @@ function App() {
   );
 }
 
-export default App;
+export default Minesweeper;
