@@ -12,15 +12,26 @@
     align-items: center;
 
     #grid {
-        width: 60svw;
-        height: 60svw;
+        width: 40svw;
+        height: 40svw;
         display: flex;
         flex-wrap: wrap;
 
         .square {
-            height: 3svw;
-            width: 3svw;
-            border: solid black 1px;
+            height: 2svw;
+            width: 2svw;
+        }
+
+        .dark{
+            background-color: limegreen;
+            filter: contrast(80%);
+        }
+        .light{
+            background-color: lightgreen;
+            filter: contrast(80%);
         }
     }
 }
+
+
+
