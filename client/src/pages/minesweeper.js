@@ -51,6 +51,7 @@ function Minesweeper() {
                 let rightClick = false
                 let leftClick = false
                 square.addEventListener('mousedown', e => {
+                    if (isGameOver) { return }
 
                     if (e.button == 0) {
                         leftClick = true
@@ -59,15 +60,16 @@ function Minesweeper() {
                     if (e.button == 2) {
                         rightClick = true
                         if (!square.classList.contains('openLight') && !square.classList.contains('openDark')) {
-                        if (square.classList.contains('flag')) {
-                            setTimeout(() => {
-                                square.classList.remove('flag')
-                                square.innerHTML = ''
-                            }, 10)
-                        } else {
-                            square.classList.add('flag')
-                            square.innerHTML = '<img class="imgFlag" src="image/flag.png"/>'
-                        }}
+                            if (square.classList.contains('flag')) {
+                                setTimeout(() => {
+                                    square.classList.remove('flag')
+                                    square.innerHTML = ''
+                                }, 10)
+                            } else {
+                                square.classList.add('flag')
+                                square.innerHTML = '<img class="imgFlag" src="image/flag.png"/>'
+                            }
+                        }
                     }
                     if (leftClick && rightClick) {
                         socket.emit('leftRightClick', i)
@@ -81,44 +83,62 @@ function Minesweeper() {
                     }, 100)
                     // if ((leftClick == false) && (rightClick == false) && (lightOn == true)) {lightLeftRightClickOFF()}
                 })
-
             }
         })
         socket.on('squareClicked', msg => {
             let square = document.getElementById(msg.id)
             square.innerHTML = ''
 
-            if (square.classList.contains('dark')) {
-                square.classList.remove('dark')
-                square.classList.add('openDark')
-            } else if (square.classList.contains('light')) {
-                square.classList.remove('light')
-                square.classList.add('openLight')
-            }
-            if (msg.data != 0) {
-                square.innerHTML = msg.data
+            if (msg.data == 'bomb') {
+                square.innerHTML = "<img class='bomb' src='image/bomb.png'/>"
+                isGameOver = true
+                socket.emit('bombExploded')
             } else {
-                //click sur les carrés a coté
-                let i = msg.id
-                let isLeftEdge = (i % width === 0)
-                let isRightEdge = (i % width === width - 1)
-                if (!isRightEdge && checkIfClickable(i + 1)) { socket.emit('click', i + 1) }
-                if (!isLeftEdge && checkIfClickable(i - 1)) { socket.emit('click', i - 1) }
-                if (!isRightEdge && checkIfClickable(i + 1 + width)) { socket.emit('click', i + 1 + width) }
-                if (!isLeftEdge && checkIfClickable(i - 1 - width)) { socket.emit('click', i - 1 - width) }
-                if (!isLeftEdge && checkIfClickable(i - 1 + width)) { socket.emit('click', i - 1 + width) }
-                if (!isRightEdge && checkIfClickable(i + 1 - width)) { socket.emit('click', i + 1 - width) }
-                if (checkIfClickable(i + width)) { socket.emit('click', i + width) }
-                if (checkIfClickable(i - width)) { socket.emit('click', i - width) }
+                if (square.classList.contains('dark')) {
+                    square.classList.remove('dark')
+                    square.classList.add('openDark')
+                } else if (square.classList.contains('light')) {
+                    square.classList.remove('light')
+                    square.classList.add('openLight')
+                }
+                if (msg.data != 0) {
+                    square.innerHTML = msg.data
+                } else if (msg.data != 'bomb') {
+                    //click sur les carrés a coté
+                    let i = msg.id
+                    let isLeftEdge = (i % width === 0)
+                    let isRightEdge = (i % width === width - 1)
+                    if (!isRightEdge && checkIfClickable(i + 1)) { socket.emit('click', i + 1) }
+                    if (!isLeftEdge && checkIfClickable(i - 1)) { socket.emit('click', i - 1) }
+                    if (!isRightEdge && checkIfClickable(i + 1 + width)) { socket.emit('click', i + 1 + width) }
+                    if (!isLeftEdge && checkIfClickable(i - 1 - width)) { socket.emit('click', i - 1 - width) }
+                    if (!isLeftEdge && checkIfClickable(i - 1 + width)) { socket.emit('click', i - 1 + width) }
+                    if (!isRightEdge && checkIfClickable(i + 1 - width)) { socket.emit('click', i + 1 - width) }
+                    if (checkIfClickable(i + width)) { socket.emit('click', i + width) }
+                    if (checkIfClickable(i - width)) { socket.emit('click', i - width) }
+                }
             }
-        })
-        socket.on('leftRightClickResponse', msg => {
-            leftRightClick(msg.id, msg.data)
         })
 
-        let grid = document.getElementById('grid')
+        socket.on('leftRightClickResponse', msg => { leftRightClick(msg.id, msg.data) })
+
+        socket.on('bombExploded', (data) => {
+            let temp = []
+            for(let i = 0; i < data.length; i++){
+                if (data[i] == 'bomb') temp.push(i)
+            }
+            shuffleArray(temp)
+            temp.forEach(e=>{
+                setTimeout(()=>{
+                    document.getElementById(e).innerHTML = "<img class='bomb' src='image/bomb.png'/>"
+                }, Math.ceil(Math.random()*10000))
+            })
+        })
     }, [])
 
+    function build() {
+
+    }
     function checkIfClickable(id) {
         if (document.getElementById(id) == null) {
             return false
@@ -194,11 +214,17 @@ function Minesweeper() {
     function click(id) {
         if (!document.getElementById(id).classList.contains('flag')) socket.emit('click', id)
     }
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
 
     return (
-        <div className="App">
-            <div id="grid"></div>
-        </div>
+        <div id="grid"></div>
     );
 }
 

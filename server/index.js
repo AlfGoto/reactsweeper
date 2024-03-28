@@ -27,9 +27,8 @@ io.on('connection', (socket) => {
 
     socket.on('click', msg => { click(socket, msg) })
     socket.on('leftRightClick', e => { socket.emit('leftRightClickResponse', { id: e, data: socket.grid[e] }) })
+    socket.on('bombExploded', ()=>{socket.emit('bombExploded', socket.grid)})
 })
-
-
 
 
 function build() {

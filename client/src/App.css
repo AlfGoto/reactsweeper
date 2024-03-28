@@ -27,10 +27,15 @@
             width: 2svw;
             font-size: 1.7svw;
 
-            .imgFlag{
+            .imgFlag {
                 height: 100%;
                 width: 100%;
                 animation: fall .15s ease;
+            }
+
+            .bomb {
+                height: 90%;
+                animation: bombEXPLODE 0.5s;
             }
         }
 
@@ -71,9 +76,21 @@
 }
 @keyframes fall {
     from {
-      transform: translateY(-20px);
+        transform: translateY(-20px);
     }
-    to{
-      transform:translateY(0);
+    to {
+        transform: translateY(0);
+    }
+}
+@keyframes bombEXPLODE{
+    0%{
+      transform: scale(1);
+    }
+    50%{
+      transform: scale(2);
+    }
+    100%{
+      transform: scale(1);
     }
   }
+  
