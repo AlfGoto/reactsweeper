@@ -45,30 +45,53 @@ function Minesweeper() {
                 }
 
                 square.addEventListener('click', () => {
-                    if(square.innerHTML == ''){
+                    if (square.innerHTML == '') {
                         socket.emit('click', i)
                     }
                 })
             }
         })
-        socket.on('squareClicked', msg=>{
+        socket.on('squareClicked', msg => {
             let square = document.getElementById(msg.id)
 
-            if(square.classList.contains('dark')){
+            if (square.classList.contains('dark')) {
                 square.classList.remove('dark')
                 square.classList.add('openDark')
             } else {
                 square.classList.remove('light')
                 square.classList.add('openLight')
             }
-            square.innerHTML = msg.data
-            
+            if (msg.data != 0) {
+                square.innerHTML = msg.data
+            } else {
+                let i = msg.id
+                let isLeftEdge = (i % width === 0)
+                let isRightEdge = (i % width === width - 1)
+                if (!isRightEdge && checkInnerHtmlNull(i + 1)) { socket.emit('click', i + 1) }
+                if (!isLeftEdge && checkInnerHtmlNull(i - 1)) { socket.emit('click', i - 1) }
+                if (!isRightEdge && checkInnerHtmlNull(i + 1 + width)) { socket.emit('click', i + 1 + width) }
+                if (!isLeftEdge && checkInnerHtmlNull(i - 1 - width)) { socket.emit('click', i + 1 - width) }
+                if (!isLeftEdge && checkInnerHtmlNull(i - 1 + width)) { socket.emit('click', i + 1 + width) }
+                if (!isRightEdge && checkInnerHtmlNull(i + 1 - width)) { socket.emit('click', i + 1 - width) }
+                if (checkInnerHtmlNull(i + width)) { socket.emit('click', i + width) }
+                if (checkInnerHtmlNull(i - width)) { socket.emit('click', i - width) }
+            }
+
         })
 
         let grid = document.getElementById('grid')
     }, [])
 
-
+    function checkInnerHtmlNull(id) {
+        if (document.getElementById(id) == null) { return false 
+        }else{
+            if (document.getElementById(id).innerHTML == '') { 
+                return true 
+            } else {
+                return false
+            }
+        }
+    }
 
     return (
         <div className="App">
