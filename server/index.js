@@ -5,6 +5,8 @@ const { cp } = require('fs')
 app.use(cors())
 app.use(express.json())
 
+const width = 20
+
 const server = app.listen(4000, () => {
     console.log('server is up & running')
 })
@@ -17,6 +19,6 @@ io = require('socket.io')(server, {
 
 io.on('connection', (socket)=>{
     console.log('Connected & socket Id is', socket.id)
-    socket.emit('msg', 'WebSocket connected')
+    socket.emit('width', width)
     socket.on('click', msg=>{console.log(msg)})
 })
