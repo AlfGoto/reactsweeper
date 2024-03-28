@@ -60,7 +60,7 @@ function Minesweeper() {
             shuffleArray(temp)
             temp.forEach(e => {
                 setTimeout(() => {
-                    document.getElementById(e).innerHTML = "<img class='bomb' src='image/bomb.png'/>"
+                    if (isGameOver) document.getElementById(e).innerHTML = "<img class='bomb' src='image/bomb.png'/>"
                 }, Math.ceil(Math.random() * 10000))
             })
         })
@@ -223,8 +223,8 @@ function Minesweeper() {
         }
     }
 
-    document.addEventListener('DOMContentLoaded', ()=>{
-        document.getElementById('restartButton').addEventListener('click', ()=>{
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('restartButton').addEventListener('click', () => {
             socket.emit('restart')
         })
     })
