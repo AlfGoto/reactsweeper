@@ -45,9 +45,24 @@ function Minesweeper() {
                 }
 
                 square.addEventListener('click', () => {
-                    socket.emit('click', i)
+                    if(square.innerHTML == ''){
+                        socket.emit('click', i)
+                    }
                 })
             }
+        })
+        socket.on('squareClicked', msg=>{
+            let square = document.getElementById(msg.id)
+
+            if(square.classList.contains('dark')){
+                square.classList.remove('dark')
+                square.classList.add('openDark')
+            } else {
+                square.classList.remove('light')
+                square.classList.add('openLight')
+            }
+            square.innerHTML = msg.data
+            
         })
 
         let grid = document.getElementById('grid')

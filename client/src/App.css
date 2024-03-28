@@ -18,20 +18,45 @@
         flex-wrap: wrap;
 
         .square {
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 2svw;
             width: 2svw;
         }
 
-        .dark{
+        .dark {
             background-color: limegreen;
             filter: contrast(80%);
         }
-        .light{
+        .light {
             background-color: lightgreen;
             filter: contrast(80%);
+        }
+        .openDark {
+            background-color: tan;
+            filter: contrast(90%);
+            animation: animChecked 0.1s;
+        }
+        .openLight {
+            background-color: wheat;
+            filter: contrast(90%);
+            animation: animChecked 0.1s;
         }
     }
 }
 
 
 
+@keyframes animChecked {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}

@@ -17,8 +17,61 @@ io = require('socket.io')(server, {
     }
 })
 
-io.on('connection', (socket)=>{
+io.on('connection', (socket) => {
     console.log('Connected & socket Id is', socket.id)
     socket.emit('width', width)
-    socket.on('click', msg=>{console.log(msg)})
+
+    socket.grid = build()
+
+
+
+
+
+
+    socket.on('click', msg => { 
+        socket.emit('squareClicked', {id: msg, data: socket.grid[msg]})
+    })
 })
+
+function build() {
+    let grid = []
+    let bombs = []
+    bombs.push(...Array(70).fill('bomb'))
+    let empties = []
+    empties.push(...Array(width * width - 70).fill('empty'))
+    grid.push(...bombs, ...empties)
+    shuffleArray(grid)
+
+    let data = []
+    grid.forEach(e => {
+        let i = grid.indexOf(e)
+        let isLeftEdge = (i % width === 0)
+        let isRightEdge = (i % width === width - 1)
+        
+        if (e != 'bomb') {
+            let total = 0
+            if(!isLeftEdge && dataCheckIfBomb(grid, i-1)){total++}
+            if(!isRightEdge && dataCheckIfBomb(grid, i+1)){total++}
+            if(!isLeftEdge &&dataCheckIfBomb(grid, i-1+width)){total++}
+            if(!isRightEdge && dataCheckIfBomb(grid, i+1-width)){total++}
+            if(!isRightEdge && dataCheckIfBomb(grid, i+1+width)){total++}
+            if(!isLeftEdge &&dataCheckIfBomb(grid, i-1-width)){total++}
+            if(dataCheckIfBomb(grid, i-width)){total++}
+            if(dataCheckIfBomb(grid, i+width)){total++}
+            grid[grid.indexOf(e)] = total
+        }
+    })
+    return grid
+}
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+function dataCheckIfBomb(arr, arg) {
+    if (arr[arg] != null) { if (arr[arg] == 'bomb') { return true } else { return false } }
+}
