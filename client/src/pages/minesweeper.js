@@ -57,7 +57,7 @@ function Minesweeper() {
             if (square.classList.contains('dark')) {
                 square.classList.remove('dark')
                 square.classList.add('openDark')
-            } else {
+            } else if(square.classList.contains('light')){
                 square.classList.remove('light')
                 square.classList.add('openLight')
             }
@@ -67,14 +67,14 @@ function Minesweeper() {
                 let i = msg.id
                 let isLeftEdge = (i % width === 0)
                 let isRightEdge = (i % width === width - 1)
-                if (!isRightEdge && checkInnerHtmlNull(i + 1)) { socket.emit('click', i + 1) }
-                if (!isLeftEdge && checkInnerHtmlNull(i - 1)) { socket.emit('click', i - 1) }
-                if (!isRightEdge && checkInnerHtmlNull(i + 1 + width)) { socket.emit('click', i + 1 + width) }
-                if (!isLeftEdge && checkInnerHtmlNull(i - 1 - width)) { socket.emit('click', i + 1 - width) }
-                if (!isLeftEdge && checkInnerHtmlNull(i - 1 + width)) { socket.emit('click', i + 1 + width) }
-                if (!isRightEdge && checkInnerHtmlNull(i + 1 - width)) { socket.emit('click', i + 1 - width) }
-                if (checkInnerHtmlNull(i + width)) { socket.emit('click', i + width) }
-                if (checkInnerHtmlNull(i - width)) { socket.emit('click', i - width) }
+                if (!isRightEdge && checkIfClickable(i + 1)) { socket.emit('click', i + 1) }
+                if (!isLeftEdge && checkIfClickable(i - 1)) { socket.emit('click', i - 1) }
+                if (!isRightEdge && checkIfClickable(i + 1 + width)) { socket.emit('click', i + 1 + width) }
+                if (!isLeftEdge && checkIfClickable(i - 1 - width)) { socket.emit('click', i + 1 - width) }
+                if (!isLeftEdge && checkIfClickable(i - 1 + width)) { socket.emit('click', i + 1 + width) }
+                if (!isRightEdge && checkIfClickable(i + 1 - width)) { socket.emit('click', i + 1 - width) }
+                if (checkIfClickable(i + width)) { socket.emit('click', i + width) }
+                if (checkIfClickable(i - width)) { socket.emit('click', i - width) }
             }
 
         })
@@ -82,13 +82,14 @@ function Minesweeper() {
         let grid = document.getElementById('grid')
     }, [])
 
-    function checkInnerHtmlNull(id) {
-        if (document.getElementById(id) == null) { return false 
-        }else{
-            if (document.getElementById(id).innerHTML == '') { 
-                return true 
-            } else {
+    function checkIfClickable(id) {
+        if (document.getElementById(id) == null) {
+            return false
+        } else {
+            if (document.getElementById(id).innerHTML != '' || document.getElementById(id).classList.contains('openDark') || document.getElementById(id).classList.contains('openLight')) {
                 return false
+            } else {
+                return true
             }
         }
     }

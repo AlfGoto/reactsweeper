@@ -22,16 +22,16 @@ io.on('connection', (socket) => {
     socket.emit('width', width)
 
     socket.grid = build()
+    socket.firstClick = true
 
 
-
-
-
-
-    socket.on('click', msg => { 
-        socket.emit('squareClicked', {id: msg, data: socket.grid[msg]})
+    socket.on('click', msg => {
+        click(socket, msg)
     })
 })
+
+
+
 
 function build() {
     let grid = []
@@ -47,23 +47,31 @@ function build() {
         let i = grid.indexOf(e)
         let isLeftEdge = (i % width === 0)
         let isRightEdge = (i % width === width - 1)
-        
+
         if (e != 'bomb') {
             let total = 0
-            if(!isLeftEdge && dataCheckIfBomb(grid, i-1)){total++}
-            if(!isRightEdge && dataCheckIfBomb(grid, i+1)){total++}
-            if(!isLeftEdge &&dataCheckIfBomb(grid, i-1+width)){total++}
-            if(!isRightEdge && dataCheckIfBomb(grid, i+1-width)){total++}
-            if(!isRightEdge && dataCheckIfBomb(grid, i+1+width)){total++}
-            if(!isLeftEdge &&dataCheckIfBomb(grid, i-1-width)){total++}
-            if(dataCheckIfBomb(grid, i-width)){total++}
-            if(dataCheckIfBomb(grid, i+width)){total++}
+            if (!isLeftEdge && dataCheckIfBomb(grid, i - 1)) { total++ }
+            if (!isRightEdge && dataCheckIfBomb(grid, i + 1)) { total++ }
+            if (!isLeftEdge && dataCheckIfBomb(grid, i - 1 + width)) { total++ }
+            if (!isRightEdge && dataCheckIfBomb(grid, i + 1 - width)) { total++ }
+            if (!isRightEdge && dataCheckIfBomb(grid, i + 1 + width)) { total++ }
+            if (!isLeftEdge && dataCheckIfBomb(grid, i - 1 - width)) { total++ }
+            if (dataCheckIfBomb(grid, i - width)) { total++ }
+            if (dataCheckIfBomb(grid, i + width)) { total++ }
             grid[grid.indexOf(e)] = total
         }
     })
     return grid
 }
-
+function click(socket, id) {
+    if(socket.firstClick && socket.grid[id] != 0){
+        socket.grid = build()
+        click(socket, id)
+    } else {
+        socket.firstClick = false
+        socket.emit('squareClicked', { id: id, data: socket.grid[id] })
+    }
+}
 function shuffleArray(array) {
     for (var i = array.length - 1; i > 0; i--) {
         var j = Math.floor(Math.random() * (i + 1));
@@ -75,3 +83,4 @@ function shuffleArray(array) {
 function dataCheckIfBomb(arr, arg) {
     if (arr[arg] != null) { if (arr[arg] == 'bomb') { return true } else { return false } }
 }
+
