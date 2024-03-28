@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css';
 import io from 'socket.io-client'
 
 function Minesweeper() {
@@ -13,77 +12,8 @@ function Minesweeper() {
 
 
         socket.on('width', msg => {
-            document.getElementById('grid').innerHTML = ''
             width = msg
-            for (let i = 0; i < width * width; i++) {
-                let square = document.createElement('div')
-                square.classList.add('square')
-                square.id = i
-                document.getElementById('grid').appendChild(square)
-
-                if (Math.ceil(i + 1 / width) % 2 == 0) {
-                    // square.classList.add(Math.ceil(i/width))
-                    if (Math.ceil(i / width) % 2 == 0) {
-                        square.classList.add('dark')
-                    } else {
-                        square.classList.add('light')
-                    }
-                } else {
-                    if (i % width == 0) {
-                        square.classList.add(Math.ceil(i / width))
-                        if (Math.ceil(i / width) % 2 == 0) {
-                            square.classList.add('dark')
-                        } else {
-                            square.classList.add('light')
-                        }
-                    } else {
-                        square.classList.add(Math.ceil(i / width))
-                        if (Math.ceil(i / width) % 2 == 0) {
-                            square.classList.add('light')
-                        } else {
-                            square.classList.add('dark')
-                        }
-                    }
-                }
-                square.oncontextmenu = function (e) {
-                    e.preventDefault()
-                }
-                let rightClick = false
-                let leftClick = false
-                square.addEventListener('mousedown', e => {
-                    if (isGameOver) { return }
-
-                    if (e.button == 0) {
-                        leftClick = true
-                        if (square.innerHTML == '') { socket.emit('click', i) }
-                    }
-                    if (e.button == 2) {
-                        rightClick = true
-                        if (!square.classList.contains('openLight') && !square.classList.contains('openDark')) {
-                            if (square.classList.contains('flag')) {
-                                setTimeout(() => {
-                                    square.classList.remove('flag')
-                                    square.innerHTML = ''
-                                }, 10)
-                            } else {
-                                square.classList.add('flag')
-                                square.innerHTML = '<img class="imgFlag" src="image/flag.png"/>'
-                            }
-                        }
-                    }
-                    if (leftClick && rightClick) {
-                        socket.emit('leftRightClick', i)
-                        // lightLeftRightClick(i, square)
-                    }
-                })
-                square.addEventListener('mouseup', g => {
-                    setTimeout(() => {
-                        if (g.button === 2) { rightClick = false }
-                        if (g.button === 0) { leftClick = false }
-                    }, 100)
-                    // if ((leftClick == false) && (rightClick == false) && (lightOn == true)) {lightLeftRightClickOFF()}
-                })
-            }
+            build()
         })
         socket.on('squareClicked', msg => {
             let square = document.getElementById(msg.id)
@@ -124,20 +54,90 @@ function Minesweeper() {
 
         socket.on('bombExploded', (data) => {
             let temp = []
-            for(let i = 0; i < data.length; i++){
+            for (let i = 0; i < data.length; i++) {
                 if (data[i] == 'bomb') temp.push(i)
             }
             shuffleArray(temp)
-            temp.forEach(e=>{
-                setTimeout(()=>{
+            temp.forEach(e => {
+                setTimeout(() => {
                     document.getElementById(e).innerHTML = "<img class='bomb' src='image/bomb.png'/>"
-                }, Math.ceil(Math.random()*10000))
+                }, Math.ceil(Math.random() * 10000))
             })
         })
     }, [])
 
     function build() {
+        isGameOver = false
+        document.getElementById('grid').innerHTML = ''
+        for (let i = 0; i < width * width; i++) {
+            let square = document.createElement('div')
+            square.classList.add('square')
+            square.id = i
+            document.getElementById('grid').appendChild(square)
 
+            if (Math.ceil(i + 1 / width) % 2 == 0) {
+                // square.classList.add(Math.ceil(i/width))
+                if (Math.ceil(i / width) % 2 == 0) {
+                    square.classList.add('dark')
+                } else {
+                    square.classList.add('light')
+                }
+            } else {
+                if (i % width == 0) {
+                    square.classList.add(Math.ceil(i / width))
+                    if (Math.ceil(i / width) % 2 == 0) {
+                        square.classList.add('dark')
+                    } else {
+                        square.classList.add('light')
+                    }
+                } else {
+                    square.classList.add(Math.ceil(i / width))
+                    if (Math.ceil(i / width) % 2 == 0) {
+                        square.classList.add('light')
+                    } else {
+                        square.classList.add('dark')
+                    }
+                }
+            }
+            square.oncontextmenu = function (e) {
+                e.preventDefault()
+            }
+            let rightClick = false
+            let leftClick = false
+            square.addEventListener('mousedown', e => {
+                if (isGameOver) { return }
+
+                if (e.button == 0) {
+                    leftClick = true
+                    if (square.innerHTML == '') { socket.emit('click', i) }
+                }
+                if (e.button == 2) {
+                    rightClick = true
+                    if (!square.classList.contains('openLight') && !square.classList.contains('openDark')) {
+                        if (square.classList.contains('flag')) {
+                            setTimeout(() => {
+                                square.classList.remove('flag')
+                                square.innerHTML = ''
+                            }, 10)
+                        } else {
+                            square.classList.add('flag')
+                            square.innerHTML = '<img class="imgFlag" src="image/flag.png"/>'
+                        }
+                    }
+                }
+                if (leftClick && rightClick) {
+                    socket.emit('leftRightClick', i)
+                    // lightLeftRightClick(i, square)
+                }
+            })
+            square.addEventListener('mouseup', g => {
+                setTimeout(() => {
+                    if (g.button === 2) { rightClick = false }
+                    if (g.button === 0) { leftClick = false }
+                }, 100)
+                // if ((leftClick == false) && (rightClick == false) && (lightOn == true)) {lightLeftRightClickOFF()}
+            })
+        }
     }
     function checkIfClickable(id) {
         if (document.getElementById(id) == null) {
@@ -222,6 +222,12 @@ function Minesweeper() {
             array[j] = temp;
         }
     }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+        document.getElementById('restartButton').addEventListener('click', ()=>{
+            socket.emit('restart')
+        })
+    })
 
     return (
         <div id="grid"></div>

@@ -20,14 +20,14 @@ io = require('socket.io')(server, {
 io.on('connection', (socket) => {
     console.log('Connected & socket Id is', socket.id)
     socket.emit('width', width)
-
+    
     socket.grid = build()
     socket.firstClick = true
-
-
+    
     socket.on('click', msg => { click(socket, msg) })
     socket.on('leftRightClick', e => { socket.emit('leftRightClickResponse', { id: e, data: socket.grid[e] }) })
     socket.on('bombExploded', ()=>{socket.emit('bombExploded', socket.grid)})
+    socket.on('restart', ()=>{socket.grid = build(); socket.emit('width', width); socket.firstClick = true})
 })
 
 

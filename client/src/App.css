@@ -3,11 +3,15 @@
     padding: 0;
     box-sizing: border-box;
     font-family: sans-serif;
+    overflow: hidden;
 }
 
 #root {
     height: 100svh;
     width: 100svw;
+    background-image: url('../public/image/login Background.png');
+    background-size: cover;
+    background-position: 20%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,6 +23,7 @@
         flex-wrap: wrap;
 
         .square {
+            overflow: visible;
             user-select: none;
             display: flex;
             justify-content: center;
@@ -61,6 +66,38 @@
     }
 }
 
+#menu {
+    position: absolute;
+    height: 100svh;
+    width: 28svw;
+    right: 0px;
+    top: 0px;
+    right: -18svw;
+    transition: right ease-in-out .5s;
+    background-color: gray;
+
+    .button {
+        height: 6.5svw;
+        width: 6.5svw;
+        margin: .5svw;
+        background-color: transparent;
+        background-size: cover;
+        border: rgb(189, 189, 189) .2svw solid;
+        border-radius: 1svw;
+    }
+    #restartButton {
+        img {
+            height: 100%;
+
+            &:hover {
+                animation: rotate .5s ease-in-out;
+            }
+        }
+
+    }
+}
+
+
 
 
 @keyframes animChecked {
@@ -82,15 +119,19 @@
         transform: translateY(0);
     }
 }
-@keyframes bombEXPLODE{
-    0%{
-      transform: scale(1);
+@keyframes bombEXPLODE {
+    0% {
+        transform: scale(1);
     }
-    50%{
-      transform: scale(2);
+    50% {
+        transform: scale(2);
     }
-    100%{
-      transform: scale(1);
+    100% {
+        transform: scale(1);
     }
-  }
-  
+}
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}
