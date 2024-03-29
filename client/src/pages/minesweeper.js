@@ -19,7 +19,7 @@ function Minesweeper() {
             let square = document.getElementById(msg.id)
             square.innerHTML = ''
 
-            if (msg.data == 'bomb') {
+            if (msg.data === 'bomb') {
                 square.innerHTML = "<img class='bomb' src='image/bomb.png'/>"
                 isGameOver = true
                 socket.emit('bombExploded')
@@ -31,9 +31,9 @@ function Minesweeper() {
                     square.classList.remove('light')
                     square.classList.add('openLight')
                 }
-                if (msg.data != 0) {
+                if (msg.data !== 0) {
                     square.innerHTML = msg.data
-                } else if (msg.data != 'bomb') {
+                } else if (msg.data !== 'bomb') {
                     //click sur les carrés a coté
                     let i = msg.id
                     let isLeftEdge = (i % width === 0)
@@ -55,7 +55,7 @@ function Minesweeper() {
         socket.on('bombExploded', (data) => {
             let temp = []
             for (let i = 0; i < data.length; i++) {
-                if (data[i] == 'bomb') temp.push(i)
+                if (data[i] === 'bomb') temp.push(i)
             }
             shuffleArray(temp)
             temp.forEach(e => {
@@ -64,6 +64,7 @@ function Minesweeper() {
                 }, Math.ceil(Math.random() * 10000))
             })
         })
+        socket.on('win', () => { win() })
     }, [])
 
     function build() {
@@ -75,7 +76,7 @@ function Minesweeper() {
             square.id = i
             document.getElementById('grid').appendChild(square)
 
-            if (Math.ceil(i + 1 / width) % 2 == 0) {
+            if (Math.ceil(i + 1 / width) % 2 === 0) {
                 // square.classList.add(Math.ceil(i/width))
                 if (Math.ceil(i / width) % 2 == 0) {
                     square.classList.add('dark')
@@ -83,16 +84,16 @@ function Minesweeper() {
                     square.classList.add('light')
                 }
             } else {
-                if (i % width == 0) {
+                if (i % width === 0) {
                     square.classList.add(Math.ceil(i / width))
-                    if (Math.ceil(i / width) % 2 == 0) {
+                    if (Math.ceil(i / width) % 2 === 0) {
                         square.classList.add('dark')
                     } else {
                         square.classList.add('light')
                     }
                 } else {
                     square.classList.add(Math.ceil(i / width))
-                    if (Math.ceil(i / width) % 2 == 0) {
+                    if (Math.ceil(i / width) % 2 === 0) {
                         square.classList.add('light')
                     } else {
                         square.classList.add('dark')
@@ -109,9 +110,9 @@ function Minesweeper() {
 
                 if (e.button == 0) {
                     leftClick = true
-                    if (square.innerHTML == '') { socket.emit('click', i) }
+                    if (square.innerHTML === '') { socket.emit('click', i) }
                 }
-                if (e.button == 2) {
+                if (e.button === 2) {
                     rightClick = true
                     if (!square.classList.contains('openLight') && !square.classList.contains('openDark')) {
                         if (square.classList.contains('flag')) {
@@ -166,37 +167,37 @@ function Minesweeper() {
             if (i === 398 && document.getElementById(i + 1).classList.contains('flag')) totalFlags++
             if (i === 379 && document.getElementById(i + 20).classList.contains('flag')) totalFlags++
             if (i === 378 && document.getElementById(i + 21).classList.contains('flag')) totalFlags++
-            if (totalFlags == data) {
-                if (isLeftEdge && isGameOver == false) {
+            if (totalFlags === data) {
+                if (isLeftEdge && isGameOver === false) {
                     click(i + 1 - width)
                     click(i - width)
                     click(i + 1)
                     click(i + 1 + width)
                     click(i + width)
-                } else if (isRightEdge && isGameOver == false) {
+                } else if (isRightEdge && isGameOver === false) {
                     click(i - 1)
                     click(i - width)
                     click(i - 1 - width)
                     click(i - 1 + width)
                     click(i + width)
-                } else if (i < 20 && isGameOver == false) {
+                } else if (i < 20 && isGameOver === false) {
                     click(i - 1)
                     click(i + 1)
                     click(i - 1 + width)
                     click(i + 1 + width)
                     click(i + width)
-                } else if (i < 400 && i > 379 && isGameOver == false) {
+                } else if (i < 400 && i > 379 && isGameOver === false) {
                     click(i - 1)
                     click(i + 1 - width)
                     click(i - width)
                     click(i - 1 - width)
                     click(i + 1)
-                } else if (i == 0 && isGameOver == false) {
+                } else if (i === 0 && isGameOver === false) {
                     click(i + 1)
                     click(i + 1 + width)
                     click(i + width)
                 } else {
-                    if (isGameOver == false) {
+                    if (isGameOver === false) {
                         click(i - 1)
                         click(i + 1 - width)
                         click(i - width)
@@ -212,7 +213,35 @@ function Minesweeper() {
         }
     }
     function click(id) {
-        if (!document.getElementById(id).classList.contains('flag')) socket.emit('click', id)
+        if (!document.getElementById(id).classList.contains('flag') && !document.getElementById(id).classList.contains('openDark') && !document.getElementById(id).classList.contains('openLight')) socket.emit('click', id)
+    }
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+    function win() {
+        isGameOver = true
+        let arr = Array.from(document.getElementsByClassName('square'))
+        shuffleArray(arr)
+        console.log(arr)
+        arr.forEach(e => {
+            setTimeout(() => {
+                if (!isGameOver) return
+                e.innerHTML = ''
+                if (e.classList.contains('openLight')) {
+                    e.classList.remove('openLight')
+                    e.classList.add('light')
+                }
+                if (e.classList.contains('openDark')) {
+                    e.classList.remove('openDark')
+                    e.classList.add('dark')
+                }
+            }, Math.ceil(Math.random() * 10000))
+        })
     }
     function shuffleArray(array) {
         for (var i = array.length - 1; i > 0; i--) {

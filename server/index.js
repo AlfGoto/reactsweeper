@@ -22,12 +22,13 @@ io.on('connection', (socket) => {
     socket.emit('width', width)
     
     socket.grid = build()
+    socket.checked = []
     socket.firstClick = true
     
     socket.on('click', msg => { click(socket, msg) })
     socket.on('leftRightClick', e => { socket.emit('leftRightClickResponse', { id: e, data: socket.grid[e] }) })
     socket.on('bombExploded', ()=>{socket.emit('bombExploded', socket.grid)})
-    socket.on('restart', ()=>{socket.grid = build(); socket.emit('width', width); socket.firstClick = true})
+    socket.on('restart', ()=>{socket.grid = build(); socket.emit('width', width); socket.firstClick = true; socket.checked = []; })
 })
 
 
@@ -62,12 +63,18 @@ function build() {
     return grid
 }
 function click(socket, id) {
+    if(socket.checked.includes(id)) return
     if (socket.firstClick && socket.grid[id] != 0) {
         socket.grid = build()
         click(socket, id)
     } else {
         socket.firstClick = false
-        socket.emit('squareClicked', { id: id, data: socket.grid[id] })
+        socket.checked.push(id)
+        if(socket.checked.length === width*width - 70){
+            socket.emit('win')
+        } else {
+            socket.emit('squareClicked', { id: id, data: socket.grid[id] })
+        }
     }
 }
 function shuffleArray(array) {
