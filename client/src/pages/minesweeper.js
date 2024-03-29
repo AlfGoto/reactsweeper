@@ -63,6 +63,7 @@ function Minesweeper() {
                     if (isGameOver) document.getElementById(e).innerHTML = "<img class='bomb' src='image/bomb.png'/>"
                 }, Math.ceil(Math.random() * 10000))
             })
+            setTimeout(()=>{document.getElementById('loseInterface').style.display = 'block'}, 4000)
         })
         socket.on('win', () => { win() })
     }, [])
@@ -242,6 +243,7 @@ function Minesweeper() {
                 }
             }, Math.ceil(Math.random() * 10000))
         })
+        setTimeout(()=>{document.getElementById('winInterface').style.display = 'block'}, 4000)
     }
     function shuffleArray(array) {
         for (var i = array.length - 1; i > 0; i--) {
@@ -259,7 +261,16 @@ function Minesweeper() {
     })
 
     return (
-        <div id="grid"></div>
+        <div>
+            <div id='winInterface' className='winlostinterface'>
+                <p>You Won !</p>
+            </div>
+            <div id='loseInterface' className='winlostinterface'>
+                <p>You Lost !</p>
+            </div>
+            <div id="grid">
+            </div>
+        </div>
     );
 }
 

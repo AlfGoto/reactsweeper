@@ -16,6 +16,25 @@
     justify-content: center;
     align-items: center;
 
+    .winlostinterface {
+        display: none;
+        position: absolute;
+        margin-left: 10%;
+        margin-top: 10%;
+        border-radius: .5svw;
+        padding: 3svw;
+        background-color: rgba(240, 248, 255, 0.125);
+        backdrop-filter: blur(2px);
+        z-index: 10;
+        animation: appearFaded 1s linear;
+        justify-self: center;
+        align-self: center;
+
+        p {
+            font-size: 3svw;
+        }
+    }
+
     #grid {
         width: 40svw;
         height: 40svw;
@@ -134,4 +153,8 @@
     to {
         transform: rotate(360deg);
     }
+}
+@keyframes appearFaded{
+    from{opacity: 0;}
+    to{opacity: 1;}
 }
