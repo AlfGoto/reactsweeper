@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client'
 
-function Minesweeper() {
+const Minesweeper = () => {
+    const [time, setTime] = useState(0)
     let width = 0
     let isGameOver = false
 
     var socket;
+    var timer;
+
     useEffect(() => {
+        timer = new timerClass()
         socket = io.connect('http://localhost:4000')
 
 
 
         socket.on('width', msg => {
+            timer.stop()
+            isGameOver = false
             width = msg
+            timer.reset()
             build()
         })
         socket.on('squareClicked', msg => {
@@ -20,6 +27,7 @@ function Minesweeper() {
             square.innerHTML = ''
 
             if (msg.data === 'bomb') {
+                timer.stop()
                 square.innerHTML = "<img class='bomb' src='image/bomb.png'/>"
                 isGameOver = true
                 socket.emit('bombExploded')
@@ -48,6 +56,8 @@ function Minesweeper() {
                     if (checkIfClickable(i - width)) { socket.emit('click', i - width) }
                 }
             }
+
+            if (!timer.counting) timer.start()
         })
 
         socket.on('leftRightClickResponse', msg => { leftRightClick(msg.id, msg.data) })
@@ -63,7 +73,7 @@ function Minesweeper() {
                     if (isGameOver) document.getElementById(e).innerHTML = "<img class='bomb' src='image/bomb.png'/>"
                 }, Math.ceil(Math.random() * 10000))
             })
-            setTimeout(()=>{document.getElementById('loseInterface').style.display = 'block'}, 4000)
+            setTimeout(() => { if (isGameOver) document.getElementById('loseInterface').style.display = 'block' }, 4000)
         })
         socket.on('win', () => { win() })
     }, [])
@@ -214,7 +224,11 @@ function Minesweeper() {
         }
     }
     function click(id) {
-        if (!document.getElementById(id).classList.contains('flag') && !document.getElementById(id).classList.contains('openDark') && !document.getElementById(id).classList.contains('openLight')) socket.emit('click', id)
+        if (!document.getElementById(id).classList.contains('flag')
+            && !document.getElementById(id).classList.contains('openDark')
+            && !document.getElementById(id).classList.contains('openLight')) {
+            socket.emit('click', id)
+        }
     }
     function shuffleArray(array) {
         for (var i = array.length - 1; i > 0; i--) {
@@ -225,6 +239,7 @@ function Minesweeper() {
         }
     }
     function win() {
+        timer.stop()
         isGameOver = true
         let arr = Array.from(document.getElementsByClassName('square'))
         shuffleArray(arr)
@@ -243,7 +258,7 @@ function Minesweeper() {
                 }
             }, Math.ceil(Math.random() * 10000))
         })
-        setTimeout(()=>{document.getElementById('winInterface').style.display = 'block'}, 4000)
+        setTimeout(() => { if (isGameOver) document.getElementById('winInterface').style.display = 'block' }, 4000)
     }
     function shuffleArray(array) {
         for (var i = array.length - 1; i > 0; i--) {
@@ -253,6 +268,27 @@ function Minesweeper() {
             array[j] = temp;
         }
     }
+    class timerClass {
+        constructor() {
+            this.counting = false
+        }
+        intervalFunction() {
+            setTime(time => time + 1)
+        }
+        start() {
+            this.interval = setInterval(this.intervalFunction, 1000)
+            this.counting = true
+        }
+        stop() {
+            clearInterval(this.interval)
+            this.counting = false
+        }
+        reset(){
+            setTime(0)
+        }
+    }
+
+
 
     document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('restartButton').addEventListener('click', () => {
@@ -264,9 +300,13 @@ function Minesweeper() {
         <div>
             <div id='winInterface' className='winlostinterface'>
                 <p>You Won !</p>
+                <p>{time}</p>
             </div>
             <div id='loseInterface' className='winlostinterface'>
                 <p>You Lost !</p>
+            </div>
+            <div id="timer">
+                <p>{time}</p>
             </div>
             <div id="grid">
             </div>

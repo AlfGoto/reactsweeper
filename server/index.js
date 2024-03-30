@@ -89,3 +89,5 @@ function dataCheckIfBomb(arr, arg) {
     if (arr[arg] != null) { if (arr[arg] == 'bomb') { return true } else { return false } }
 }
 
+
+

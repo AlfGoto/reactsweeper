@@ -92,7 +92,7 @@
     right: 0px;
     top: 0px;
     right: -18svw;
-    transition: right ease-in-out .5s;
+    transition: right ease-in-out .3s;
     background-color: gray;
 
     .button {
@@ -158,3 +158,7 @@
     from{opacity: 0;}
     to{opacity: 1;}
 }
+
+
+
+
